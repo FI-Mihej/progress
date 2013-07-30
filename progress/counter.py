@@ -16,11 +16,14 @@
 
 from . import Infinite, Progress
 from .helpers import WriteMixin
+import os
 
 
 class Counter(WriteMixin, Infinite):
     message = ''
     hide_cursor = True
+    if os.name == 'nt':
+        hide_cursor = False
 
     def update(self):
         self.write(str(self.index))
@@ -28,6 +31,8 @@ class Counter(WriteMixin, Infinite):
 
 class Countdown(WriteMixin, Progress):
     hide_cursor = True
+    if os.name == 'nt':
+        hide_cursor = False
 
     def update(self):
         self.write(str(self.remaining))
@@ -36,6 +41,8 @@ class Countdown(WriteMixin, Progress):
 class Stack(WriteMixin, Progress):
     phases = (u' ', u'▁', u'▂', u'▃', u'▄', u'▅', u'▆', u'▇', u'█')
     hide_cursor = True
+    if os.name == 'nt':
+        hide_cursor = False
 
     def update(self):
         nphases = len(self.phases)

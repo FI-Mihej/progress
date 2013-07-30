@@ -16,6 +16,7 @@
 
 from . import Progress
 from .helpers import WritelnMixin
+import os
 
 
 class Bar(WritelnMixin, Progress):
@@ -27,6 +28,8 @@ class Bar(WritelnMixin, Progress):
     empty_fill = ' '
     fill = '#'
     hide_cursor = True
+    if os.name == 'nt':
+        hide_cursor = False
 
     def update(self):
         filled_length = int(self.width * self.progress)

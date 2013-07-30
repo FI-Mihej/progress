@@ -16,13 +16,16 @@
 
 from . import Infinite
 from .helpers import WriteMixin
+import os
 
 
 class Spinner(WriteMixin, Infinite):
     message = ''
     phases = ('-', '\\', '|', '/')
     hide_cursor = True
-
+    if os.name == 'nt':
+        hide_cursor = False
+    
     def update(self):
         i = self.index % len(self.phases)
         self.write(self.phases[i])

@@ -13,6 +13,7 @@
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 from __future__ import print_function
+import os
 
 
 HIDE_CURSOR = '\x1b[?25l'
@@ -21,6 +22,8 @@ SHOW_CURSOR = '\x1b[?25h'
 
 class WriteMixin(object):
     hide_cursor = False
+    if os.name == 'nt':
+        hide_cursor = False
 
     def __init__(self, message=None, **kwargs):
         super(WriteMixin, self).__init__(**kwargs)
@@ -37,18 +40,22 @@ class WriteMixin(object):
     def write(self, s):
         if self.file.isatty():
             b = '\b' * self._width
-            c = s.encode('utf8').ljust(self._width)
+            c = (s.encode('utf8').ljust(self._width)).decode()
             print(b + c, end='', file=self.file)
-            self._width = max(self._width, len(s))
+            self._width = max(self._width, len(s.encode('utf8')))
             self.file.flush()
 
     def finish(self):
-        if self.file.isatty() and self.hide_cursor:
-            print(SHOW_CURSOR, end='', file=self.file)
+        if self.file.isatty():
+            print(file=self.file)
+            if self.hide_cursor:
+                print(SHOW_CURSOR, end='', file=self.file)
 
 
 class WritelnMixin(object):
     hide_cursor = False
+    if os.name == 'nt':
+        hide_cursor = False
 
     def __init__(self, message=None, **kwargs):
         super(WritelnMixin, self).__init__(**kwargs)
@@ -60,12 +67,15 @@ class WritelnMixin(object):
 
     def clearln(self):
         if self.file.isatty():
-            print('\r\x1b[K', end='', file=self.file)
+            if os.name == 'nt':
+                print('\r\x1b', end='', file=self.file)
+            else:
+                print('\r\x1b[K', end='', file=self.file)
 
     def writeln(self, line):
         if self.file.isatty():
             self.clearln()
-            print(line.encode('utf8'), end='', file=self.file)
+            print(line, end='', file=self.file)
             self.file.flush()
 
     def finish(self):
